@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #e8f0fe;
+      font-family: Arial, sans-serif;
+    }
+
+    .calculator {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 10px;
+      max-width: 300px;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .boxer {
+      grid-column: 1 / -1;
+      text-align: center;
+      font-size: 24px;
+      padding: 10px;
+      font-weight: bold;
+      background-color: #3b82f6;
+      color: white;
+      border-radius: 5px;
+    }
+
+    .display {
+      grid-column: 1 / -1;
+      text-align: right;
+      padding: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      background-color: #f7f9fc;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      min-height: 50px;
+    }
+
+    .btn {
+      padding: 15px;
+      font-size: 18px;
+      text-align: center;
+      background-color: #f1f5f9;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #e2e8f0;
+      transform: scale(1.05);
+    }
+
+    .operator {
+      background-color: #93c5fd;
+      color: white;
+    }
+
+    .operator:hover {
+      background-color: #60a5fa;
+    }
+
+    .equals {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .equals:hover {
+      background-color: #059669;
+    }
+
+    .footer {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 5px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="boxer" id="boxer">Calculator</div>
+    <div class="display" id="display">0</div>
+    <button class="btn" id="clear">C</button>
+    <button class="btn" id="backspace">←</button>
+    <button class="btn operator" id="divide">/</button>
+    <button class="btn operator" id="multiply">*</button>
+    <button class="btn" id="7">7</button>
+    <button class="btn" id="8">8</button>
+    <button class="btn" id="9">9</button>
+    <button class="btn operator" id="subtract">-</button>
+    <button class="btn" id="4">4</button>
+    <button class="btn" id="5">5</button>
+    <button class="btn" id="6">6</button>
+    <button class="btn operator" id="add">+</button>
+    <button class="btn" id="1">1</button>
+    <button class="btn" id="2">2</button>
+    <button class="btn" id="3">3</button>
+    <button class="btn" id="decimal">.</button>
+    <button class="btn" id="0">0</button>
+    <button class="btn equals" id="equals">=</button>
+    <div class="footer" id="footer">Devoloped by Ravi</div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const display = document.getElementById("display");
+      let currentInput = "0";
+      let currentOperator = "";
+      let prevInput = "";
+
+      function updateDisplay() {
+        display.textContent = currentInput;
+      }
+
+      function handleDigitClick(digit) {
+        if (currentInput === "0" || currentInput === "Error") {
+          currentInput = digit;
+        } else {
+          currentInput += digit;
+        }
+        updateDisplay();
+      }
+
+      function handleOperatorClick(operator) {
+        if (currentInput === "Error") return;
+        prevInput = currentInput;
+        currentInput = "0";
+        currentOperator = operator;
+      }
+
+      function handleEqualsClick() {
+        if (!prevInput || !currentOperator) return;
+
+        const prev = parseFloat(prevInput);
+        const current = parseFloat(currentInput);
+
+        if (currentOperator === "/" && current === 0) {
+          currentInput = "Error";
+        } else {
+          switch (currentOperator) {
+            case "+":
+              currentInput = prev + current;
+              break;
+            case "-":
+              currentInput = prev - current;
+              break;
+            case "*":
+              currentInput = prev * current;
+              break;
+            case "/":
+              currentInput = prev / current;
+              break;
+          }
+        }
+
+        currentOperator = "";
+        prevInput = "";
+        updateDisplay();
+      }
+
+      function clear() {
+        currentInput = "0";
+        currentOperator = "";
+        prevInput = "";
+        updateDisplay();
+      }
+
+      function backspace() {
+        if (currentInput.length === 1 || currentInput === "Error") {
+          currentInput = "0";
+        } else {
+          currentInput = currentInput.slice(0,-1);
+        }
+        updateDisplay();
+      }
+
+      // Add event listeners for buttons
+      for (let i = 0; i <= 9; i++) {
+        document.getElementById(i.toString()).addEventListener("click", () => {
+          handleDigitClick(i.toString());
+        });
+      }
+
+      document.getElementById("add").addEventListener("click", () => handleOperatorClick("+"));
+      document.getElementById("subtract").addEventListener("click", () => handleOperatorClick("-"));
+      document.getElementById("multiply").addEventListener("click", () => handleOperatorClick("*"));
+      document.getElementById("divide").addEventListener("click", () => handleOperatorClick("/"));
+
+      document.getElementById("decimal").addEventListener("click", () => {
+        if (!currentInput.includes(".")) {
+          currentInput += ".";
+          updateDisplay();
+        }
+      });
+
+      document.getElementById("equals").addEventListener("click", handleEqualsClick);
+      document.getElementById("clear").addEventListener("click", clear);
+      document.getElementById("backspace").addEventListener("click", backspace);
+
+      // Keyboard support
+      document.addEventListener("keydown", (e) => {
+        if (!isNaN(e.key)) handleDigitClick(e.key);
+        else if (e.key === "+") handleOperatorClick("+");
+        else if (e.key === "-") handleOperatorClick("-");
+        else if (e.key === "*") handleOperatorClick("*");
+        else if (e.key === "/") handleOperatorClick("/");
+        else if (e.key === "Enter") handleEqualsClick();
+        else if (e.key === "Backspace") backspace();
+        else if (e.key === "Escape") clear();
+        else if (e.key === "." && !currentInput.includes(".")) {
+          currentInput += ".";
+          updateDisplay();
+        }
+      });
+
+      updateDisplay();
+    });
+  </script>
+</body>
+</html>
